@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IntelliRAG – Adaptive Knowledge Intelligence Platform</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧠%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#f5f6fb;--panel:#fff;--ink:#161a2e;--mute:#667089;--line:#e3e6f0;--acc:#4f46e5;--acc2:#7c3aed;--accbg:#eef0ff;--ok:#0f9d6b;--okbg:#e3f7ef;--warn:#b7791f;--warnbg:#fff4dc;--bad:#d1435b;--badbg:#fde8ec;--shadow:0 1px 2px rgba(20,24,50,.06),0 8px 24px rgba(20,24,50,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1020;--panel:#171a30;--ink:#eceefb;--mute:#9aa1bd;--line:#2a2e4a;--acc:#8b86ff;--acc2:#a78bfa;--accbg:#232652;--ok:#3ddc9a;--okbg:#12362b;--warn:#f5b84a;--warnbg:#3a2f12;--bad:#ff7a90;--badbg:#3d1822;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+button,input,textarea{font:inherit;color:inherit}
+.top{display:flex;align-items:center;gap:14px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;font-size:20px}
+.brand b{font-size:18px;letter-spacing:-.2px;display:block;line-height:1.1}.brand small{color:var(--mute);font-size:12px}
+.tabs{display:flex;gap:4px;margin-left:12px}
+.tabs button{border:0;background:none;padding:8px 14px;border-radius:9px;cursor:pointer;color:var(--mute);font-weight:600}
+.tabs button.active{background:var(--accbg);color:var(--acc)}
+.pill{margin-left:auto;font-size:12.5px;padding:6px 12px;border-radius:99px;background:var(--warnbg);color:var(--warn);font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--okbg);color:var(--ok)}
+.icon{display:none;border:1px solid var(--line);background:var(--panel);border-radius:9px;width:38px;height:38px;cursor:pointer;font-size:18px}
+.layout{flex:1;display:grid;grid-template-columns:330px 1fr;min-height:0}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow:auto}
+main{min-width:0;display:flex;flex-direction:column;min-height:0}
+section.tab{flex:1;overflow:auto;min-height:0}
+h3{margin:18px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--mute)}
+aside h3:first-child{margin-top:0}
+.drop{display:block;border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;cursor:pointer;color:var(--mute);transition:.15s}
+.drop:hover,.drop.over{border-color:var(--acc);background:var(--accbg);color:var(--acc)}
+.drop b{display:block;color:var(--ink);margin-bottom:2px}.drop input{display:none}
+#upStatus{font-size:13px;margin-top:8px;color:var(--mute)}
+.doc{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;margin-top:8px;background:var(--bg)}
+.doc input{accent-color:var(--acc)}
+.doc .nm{flex:1;min-width:0}.doc .nm b{display:block;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.doc .nm small{color:var(--mute);font-size:12px}
+.doc button{border:0;background:none;cursor:pointer;color:var(--mute);font-size:16px;border-radius:7px;padding:2px 6px}.doc button:hover{background:var(--badbg);color:var(--bad)}
+.hint{font-size:12px;color:var(--mute);margin-top:6px}
+.sw{display:flex;align-items:flex-start;gap:10px;padding:7px 0;cursor:pointer}
+.sw input{display:none}
+.sw .tg{flex:none;width:36px;height:20px;border-radius:99px;background:var(--line);position:relative;transition:.15s;margin-top:2px}
+.sw .tg::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw input:checked+.tg{background:var(--acc)}.sw input:checked+.tg::after{left:18px}
+.sw span.t b{display:block;font-size:13.5px}.sw span.t small{color:var(--mute);font-size:12px;line-height:1.3;display:block}
+.row{display:flex;gap:8px;align-items:center}
+.row input[type=number]{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--bg)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+#messages{padding:22px;display:flex;flex-direction:column;gap:18px;max-width:900px;width:100%;margin:0 auto}
+.welcome{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-radius:20px;padding:28px;box-shadow:var(--shadow)}
+.welcome h1{margin:0 0 6px;font-size:26px;letter-spacing:-.4px}.welcome p{margin:0 0 16px;opacity:.92}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#fff;border-radius:99px;padding:7px 14px;cursor:pointer;font-size:13.5px}
+.chip:hover{background:rgba(255,255,255,.28)}
+.msg{max-width:100%}
+.msg.user{align-self:flex-end;background:var(--acc);color:#fff;padding:10px 16px;border-radius:18px 18px 4px 18px;max-width:80%;white-space:pre-wrap;word-break:break-word}
+.msg.bot{background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:16px 18px;box-shadow:var(--shadow)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--accbg);color:var(--acc)}
+.badge.ok{background:var(--okbg);color:var(--ok)}.badge.warn{background:var(--warnbg);color:var(--warn)}.badge.bad{background:var(--badbg);color:var(--bad)}
+.ans p{margin:0 0 8px}.ans ul{margin:4px 0 8px;padding-left:20px}.ans li{margin:2px 0}
+.cite{display:inline-grid;place-items:center;min-width:19px;height:19px;border-radius:6px;background:var(--accbg);color:var(--acc);font-size:11px;font-weight:700;margin:0 2px;cursor:pointer;vertical-align:1px;text-decoration:none}
+.cite:hover{background:var(--acc);color:#fff}
+.times{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.times span{font-size:11.5px;color:var(--mute);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:2px 8px}
+.times span b{color:var(--ink)}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute);font-size:13px;font-weight:600;padding:4px 0}
+.src{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--bg);transition:.3s}
+.src.flash{border-color:var(--acc);box-shadow:0 0 0 3px var(--accbg)}
+.src .hd{display:flex;align-items:center;gap:8px;font-size:13px;flex-wrap:wrap}.src .hd b{font-size:13.5px}
+.bar{flex:1;min-width:70px;height:6px;border-radius:9px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:9px}
+.src small{color:var(--mute)}.src p{margin:6px 0 0;font-size:13px;color:var(--ink);opacity:.9;max-height:150px;overflow:auto}
+.tr{font-size:13px;color:var(--mute)}.tr li{margin:3px 0}.tr code{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--ink)}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600}
+.btn:hover{border-color:var(--acc);color:var(--acc)}.btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}.btn.primary:hover{opacity:.9;color:#fff}.btn:disabled{opacity:.5;cursor:wait}
+.typing{display:flex;gap:5px;align-items:center;color:var(--mute)}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.errbox{background:var(--badbg);color:var(--bad);border-radius:12px;padding:10px 14px}
+#composer{border-top:1px solid var(--line);background:var(--panel);padding:12px 18px}
+#composer .in{max-width:900px;margin:0 auto;display:flex;gap:10px}
+#composer textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:14px;padding:11px 14px;background:var(--bg);max-height:140px;outline:none}
+#composer textarea:focus{border-color:var(--acc)}
+#composer .btn.primary{padding:0 22px;border-radius:14px;font-size:15px}
+.page{max-width:980px;margin:0 auto;padding:24px}
+.page h2{margin:0 0 6px;font-size:22px}.page p.lead{color:var(--mute);margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}th{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.wrapx{overflow-x:auto}
+.mini{display:flex;align-items:center;gap:6px;min-width:150px}.mini .bar{height:8px}.mini em{font-style:normal;font-size:12px;width:42px;text-align:right}
+.big{display:flex;gap:14px;flex-wrap:wrap}.kpi{flex:1;min-width:150px;background:var(--accbg);border-radius:14px;padding:14px}.kpi b{font-size:26px;color:var(--acc);display:block;line-height:1.1}.kpi span{font-size:12.5px;color:var(--mute)}
+.ok-t{color:var(--ok);font-weight:700}.no-t{color:var(--bad);font-weight:700}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.step{flex:1;min-width:130px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--mute)}.step b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:2px}
+.arrow{align-self:center;color:var(--acc);font-weight:800}
+.st{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}.st.b{background:var(--okbg);color:var(--ok)}.st.k{background:var(--warnbg);color:var(--warn)}.st.n{background:var(--bg);color:var(--mute);border:1px solid var(--line)}
+.overlay{display:none}
+@media (max-width:960px){
+ .icon{display:block}.layout{grid-template-columns:1fr}
+ aside{position:fixed;top:0;bottom:0;left:-350px;width:330px;z-index:50;transition:.2s;box-shadow:var(--shadow)}
+ aside.open{left:0}.overlay.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+ .tabs{order:5;width:100%;margin:0;overflow-x:auto}.pill{font-size:11.5px;margin-left:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}.brand small{display:none}
+ #messages{padding:14px}.msg.user{max-width:92%}.welcome{padding:20px}.page{padding:16px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="icon" id="menuBtn" aria-label="Open documents panel">☰</button>
+  <div class="brand"><div class="logo">🧠</div><div><b>IntelliRAG</b><small>Adaptive Knowledge Intelligence Platform</small></div></div>
+  <nav class="tabs">
+    <button data-tab="chat" class="active">Chat</button>
+    <button data-tab="eval">Evaluation</button>
+    <button data-tab="how">How it works</button>
+  </nav>
+  <div class="pill" id="pill">Connecting…</div>
+</header>
+<div class="overlay" id="overlay"></div>
+<div class="layout">
+<aside id="side">
+  <h3>Documents</h3>
+  <label class="drop" id="drop"><b>＋ Upload documents</b>PDF, TXT or MD · drag &amp; drop or click
+    <input type="file" id="file" accept=".pdf,.txt,.md" multiple></label>
+  <div id="upStatus"></div>
+  <div id="docList"></div>
+  <div class="hint">Tick files to search only inside them (metadata filter).</div>
+
+  <h3>Search settings</h3>
+  <div class="row"><span style="font-size:13px;flex:none">Top-K passages</span><input type="range" id="topk" min="2" max="10" value="5"><b id="topkv">5</b></div>
+  <div class="row" style="margin-top:8px"><input type="number" id="pmin" min="1" placeholder="Page from"><input type="number" id="pmax" min="1" placeholder="Page to"></div>
+  <div class="hint">Optional page range filter (PDF pages).</div>
+
+  <h3>Advanced RAG</h3>
+  <label class="sw"><input type="checkbox" id="o_rewrite" checked><i class="tg"></i><span class="t"><b>Query rewriting</b><small>Turns follow-up questions into standalone searches</small></span></label>
+  <label class="sw"><input type="checkbox" id="o_multi" checked><i class="tg"></i><span class="t"><b>Multi-query retrieval</b><small>Searches with several versions of your question</small></span></label>
+  <label class="sw"><input type="checkbox" id="o_hybrid" checked><i class="tg"></i><span class="t"><b>Hybrid search</b><small>Keywords (BM25) + meaning (vectors)</small></span></label>
+  <label class="sw"><input type="checkbox" id="o_rerank" checked><i class="tg"></i><span class="t"><b>Reranking</b><small>Cross-encoder re-orders the best passages</small></span></label>
+  <label class="sw"><input type="checkbox" id="o_hop"><i class="tg"></i><span class="t"><b>Multi-hop retrieval</b><small>A second search for missing facts (slower)</small></span></label>
+  <div class="hint" id="llmHint"></div>
+  <div style="margin-top:14px"><button class="btn" id="clearBtn">Clear chat</button></div>
+</aside>
+
+<main>
+<section class="tab" id="tab-chat">
+  <div id="messages">
+    <div class="welcome" id="welcome">
+      <h1>Ask your documents anything</h1>
+      <p>IntelliRAG finds the exact passages that answer your question and shows the source and page for every answer.</p>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</section>
+<section class="tab" id="tab-eval" hidden>
+  <div class="page">
+    <h2>Evaluation dashboard</h2>
+    <p class="lead">Measures how well each retrieval strategy finds the correct passage. A question counts as a hit when one of the top results contains the expected fact from the right file.</p>
+    <div class="card">
+      <div class="actions" style="margin:0"><button class="btn primary" id="runEval">▶ Run benchmark</button><span id="evalInfo" class="hint" style="margin:0"></span></div>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+</section>
+<section class="tab" id="tab-how" hidden>
+  <div class="page">
+    <h2>How IntelliRAG works</h2>
+    <p class="lead">A Retrieval-Augmented Generation pipeline written fully in Python.</p>
+    <div class="card"><div class="flow">
+      <div class="step"><b>1 Load</b>PDF / TXT with page numbers</div><div class="arrow">→</div>
+      <div class="step"><b>2 Chunk</b>Small overlapping passages</div><div class="arrow">→</div>
+      <div class="step"><b>3 Embed + Index</b>MiniLM vectors in FAISS, BM25 keywords</div><div class="arrow">→</div>
+      <div class="step"><b>4 Retrieve</b>Rewrite, multi-query, hybrid, filter, rerank</div><div class="arrow">→</div>
+      <div class="step"><b>5 Generate</b>Prompt template + LLM</div><div class="arrow">→</div>
+      <div class="step"><b>6 Cite</b>Sources, confidence, safe fallback</div>
+    </div></div>
+    <div class="card wrapx"><table>
+      <thead><tr><th>RAG concept</th><th>Where in the code</th><th>Status</th></tr></thead>
+      <tbody id="concepts"></tbody>
+    </table>
+    <p class="hint">“Needs LLM key” features switch on when a Groq, OpenAI or Ollama model is configured. Without one the app still searches and shows the best passage.</p></div>
+    <div class="card"><b>Technology:</b> Python · FastAPI · Sentence-Transformers (MiniLM + cross-encoder) · FAISS · BM25 · PyPDF · HTML/CSS/JavaScript front end</div>
+  </div>
+</section>
+
+<form id="composer" autocomplete="off">
+  <div class="in"><textarea id="q" rows="1" placeholder="Ask a question about your documents…" maxlength="1000"></textarea>
+  <button class="btn primary" id="send" type="submit">Ask</button></div>
+</form>
+</main>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={docs:[],history:[],busy:false,ready:false,llm:false};
+
+async function api(path,opts){
+  const r=await fetch(path,opts); let d=null; try{d=await r.json()}catch(e){}
+  if(!r.ok){const m=d&&d.detail; throw new Error(typeof m==='string'?m:(m?JSON.stringify(m):'Request failed ('+r.status+')'))}
+  return d;
+}
+/* ---------- tabs & drawer ---------- */
+$$('.tabs button').forEach(b=>b.onclick=()=>{
+  $$('.tabs button').forEach(x=>x.classList.toggle('active',x===b));
+  ['chat','eval','how'].forEach(t=>$('#tab-'+t).hidden=(t!==b.dataset.tab));
+  $('#composer').hidden=(b.dataset.tab!=='chat');
+});
+const drawer=o=>{$('#side').classList.toggle('open',o);$('#overlay').classList.toggle('show',o)};
+$('#menuBtn').onclick=()=>drawer(true); $('#overlay').onclick=()=>drawer(false);
+$('#topk').oninput=e=>$('#topkv').textContent=e.target.value;
+
+/* ---------- status ---------- */
+async function poll(){
+  try{
+    const s=await api('/api/status'); S.llm=s.llm.available;
+    const pill=$('#pill');
+    if(s.phase!=='ready'){pill.className='pill';pill.textContent='⏳ '+s.message;}
+    else{pill.className='pill ok';pill.textContent=(s.llm.available?'AI: '+s.llm.provider+' · '+s.llm.model:'Retrieval-only mode')+' · '+s.documents+' docs · '+s.chunks+' chunks';}
+    $('#llmHint').textContent=s.llm.available?'':'No LLM key set: rewriting, multi-query, multi-hop and answer writing are off. Retrieval still works.';
+    $('#evalInfo').textContent=s.eval_questions+' test questions in data/eval_set.json';
+    S.ready=s.phase==='ready';
+    if(s.chunks>0||S.ready) await loadDocs();
+    if(!S.ready) setTimeout(poll,2500);
+  }catch(e){$('#pill').textContent='Server not reachable'; setTimeout(poll,4000)}
+}
+async function loadDocs(){const d=await api('/api/documents'); S.docs=d.documents; renderDocs();}
+function renderDocs(){
+  const keep=new Set($$('#docList input.sel:checked').map(i=>i.value));
+  $('#docList').innerHTML=S.docs.map(d=>`<div class="doc"><input type="checkbox" class="sel" value="${esc(d.name)}" ${keep.has(d.name)?'checked':''} title="Search only in this file">
+    <div class="nm"><b title="${esc(d.name)}">${esc(d.name)}</b><small>${d.chunks} chunks${d.pages?' · '+d.pages+' pages':''}</small></div>
+    <button data-del="${esc(d.name)}" title="Remove">✕</button></div>`).join('')||'<div class="hint">No documents yet.</div>';
+  $$('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Remove '+b.dataset.del+'?'))return;
+    try{const r=await api('/api/documents/'+encodeURIComponent(b.dataset.del),{method:'DELETE'});S.docs=r.documents;renderDocs()}catch(e){alert(e.message)}});
+  const names=S.docs.map(d=>d.name);
+  $('#chips').innerHTML=(names.some(n=>/hr|policy/i.test(n))?['What is the leave policy?','How many days of maternity leave are given?']:[]).concat(
+    names.some(n=>/note|python|rag/i.test(n))?['What is RAG?','Explain chunking in simple words']:[],['Summarize the key points of these documents']).slice(0,5)
+    .map(t=>`<button class="chip" type="button">${esc(t)}</button>`).join('');
+  $$('.chip').forEach(c=>c.onclick=()=>{$('#q').value=c.textContent;ask()});
+  $('#q').disabled=!S.docs.length;
+  $('#q').placeholder=S.docs.length?'Ask a question about your documents…':'Upload a document or wait for indexing…';
+}
+/* ---------- upload ---------- */
+async function upload(files){
+  if(!files.length)return; const fd=new FormData(); [...files].forEach(f=>fd.append('files',f));
+  $('#upStatus').textContent='⏳ Reading and indexing… large PDFs can take a minute.';
+  try{
+    const r=await api('/api/upload',{method:'POST',body:fd}); S.docs=r.documents; renderDocs();
+    $('#upStatus').innerHTML=r.report.map(x=>x.error?`<div class="no-t">${esc(x.name)}: ${esc(x.error)}</div>`:`<div class="ok-t">✓ ${esc(x.name)}: ${x.chunks} chunks indexed</div>`).join('');
+    poll();
+  }catch(e){$('#upStatus').innerHTML=`<div class="no-t">${esc(e.message)}</div>`}
+  $('#file').value='';
+}
+$('#file').onchange=e=>upload(e.target.files);
+const drop=$('#drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>upload(e.dataTransfer.files));
+
+/* ---------- chat ---------- */
+function options(){
+  const sel=$$('#docList input.sel:checked').map(i=>i.value), a=parseInt($('#pmin').value), b=parseInt($('#pmax').value);
+  return {rewrite:$('#o_rewrite').checked,multi_query:$('#o_multi').checked,hybrid:$('#o_hybrid').checked,
+    rerank:$('#o_rerank').checked,multi_hop:$('#o_hop').checked,top_k:+$('#topk').value,
+    sources:sel.length?sel:null,page_min:isNaN(a)?null:a,page_max:isNaN(b)?null:b};
+}
+function fmt(text){
+  let h=esc(text).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>'),out='',list=false;
+  for(const ln of h.split('\n')){
+    const m=ln.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)$/);
+    if(m){if(!list){out+='<ul>';list=true}out+='<li>'+m[1]+'</li>'}
+    else{if(list){out+='</ul>';list=false}if(ln.trim())out+='<p>'+ln+'</p>'}
+  }
+  if(list)out+='</ul>';
+  return out.replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g,(m,g)=>g.split(/\s*,\s*/).map(n=>`<a class="cite" data-n="${n}">${n}</a>`).join(''));
+}
+function scroll(){const t=$('#tab-chat');t.scrollTop=t.scrollHeight}
+function addUser(t){$('#welcome').hidden=true;const d=document.createElement('div');d.className='msg user';d.textContent=t;$('#messages').appendChild(d);scroll()}
+function addTyping(){const d=document.createElement('div');d.className='msg bot';d.innerHTML='<div class="typing"><i></i><i></i><i></i><span>&nbsp;Searching your documents…</span></div>';$('#messages').appendChild(d);scroll();return d}
+const LABEL={rewrite:'Rewrite',multi_query:'Multi-query',retrieval:'Retrieval',multi_hop:'Multi-hop',generation:'Answer',total:'Total'};
+function render(el,q,res){
+  const conf=Math.round((res.confidence||0)*100), cls=res.mode==='fallback'?'bad':conf>=70?'ok':conf>=40?'warn':'bad';
+  const mode={llm:'AI answer',extractive:'Best passage · retrieval only',fallback:'Not found in documents'}[res.mode]||res.mode;
+  const tm=res.trace.timings_ms||{}, T=Object.keys(LABEL).filter(k=>tm[k]!=null).map(k=>`<span>${LABEL[k]} <b>${tm[k]} ms</b></span>`).join('');
+  const tr=res.trace, steps=[];
+  steps.push(`<li>Search query: <code>${esc(tr.standalone_query)}</code></li>`);
+  if(tr.queries&&tr.queries.length>1)steps.push(`<li>Multi-query variants: ${tr.queries.slice(1).map(x=>'<code>'+esc(x)+'</code>').join(' ')}</li>`);
+  if(tr.follow_up_query)steps.push(`<li>Multi-hop follow-up: <code>${esc(tr.follow_up_query)}</code></li>`);
+  steps.push(`<li>Reranking: ${tr.rerank_used?'applied':'not used'}</li>`);
+  (tr.notes||[]).forEach(n=>steps.push(`<li>ℹ️ ${esc(n)}</li>`));
+  const src=(res.sources||[]).map(s=>`<div class="src" data-n="${s.n}"><div class="hd"><b>[${s.n}] ${esc(s.source)}</b><small>${s.page!=null?'page '+s.page:'text file'}</small>
+    <div class="bar"><i style="width:${Math.round(s.confidence*100)}%"></i></div><small>${Math.round(s.confidence*100)}% · sim ${s.similarity}${s.rerank!=null?' · rerank '+s.rerank:''}</small></div><p>${esc(s.text)}</p></div>`).join('');
+  el.innerHTML=`<div class="badges"><span class="badge ${cls}">${res.mode==='fallback'?'No answer':'Confidence '+conf+'%'}</span><span class="badge">${mode}</span></div>
+    <div class="ans">${fmt(res.answer)}</div><div class="times">${T}</div>
+    <details><summary>How this answer was produced</summary><ul class="tr">${steps.join('')}</ul></details>
+    ${src?`<details class="srcs" open><summary>Sources (${res.sources.length})</summary>${src}</details>`:''}
+    <div class="actions"><button class="btn" data-copy>Copy answer</button>${res.mode==='llm'?'<button class="btn" data-rate>Rate this answer</button>':''}<span class="rate"></span></div>`;
+  el.querySelectorAll('.cite').forEach(c=>c.onclick=()=>{
+    const box=el.querySelector('.srcs'); if(!box)return; box.open=true;
+    const card=box.querySelector('.src[data-n="'+c.dataset.n+'"]'); if(!card)return;
+    card.scrollIntoView({behavior:'smooth',block:'center'}); card.classList.add('flash'); setTimeout(()=>card.classList.remove('flash'),1400)});
+  const cp=el.querySelector('[data-copy]'); cp.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(res.answer);cp.textContent='Copied ✓'};
+  const rt=el.querySelector('[data-rate]'); if(rt)rt.onclick=async()=>{
+    rt.disabled=true; rt.textContent='Rating…';
+    try{const r=await api('/api/judge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,answer:res.answer,context:res.sources.map(s=>'['+s.n+'] '+s.text).join('\n\n')})});
+      el.querySelector('.rate').innerHTML=`<span class="badge ok">Groundedness ${r.groundedness??'?'}/5</span> <span class="badge ok">Relevance ${r.relevance??'?'}/5</span> <small style="color:var(--mute)">${esc(r.comment||'')}</small>`;rt.remove()}
+    catch(e){rt.disabled=false;rt.textContent='Rate this answer';el.querySelector('.rate').innerHTML=`<span class="no-t">${esc(e.message)}</span>`}};
+}
+async function ask(){
+  const q=$('#q').value.trim(); if(!q||S.busy)return;
+  S.busy=true; $('#send').disabled=true; $('#q').value=''; $('#q').style.height='auto';
+  addUser(q); const el=addTyping();
+  try{
+    const res=await api('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,history:S.history.slice(-6),options:options()})});
+    render(el,q,res); S.history.push({role:'user',content:q},{role:'assistant',content:res.answer});
+  }catch(e){el.innerHTML=`<div class="errbox">⚠️ ${esc(e.message)}</div>`}
+  S.busy=false; $('#send').disabled=false; scroll(); $('#q').focus();
+}
+$('#composer').onsubmit=e=>{e.preventDefault();ask()};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask()}});
+$('#q').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,140)+'px'});
+$('#clearBtn').onclick=()=>{S.history=[];$$('#messages .msg').forEach(m=>m.remove());$('#welcome').hidden=false;drawer(false)};
+
+/* ---------- evaluation ---------- */
+const bar=v=>`<div class="mini"><div class="bar"><i style="width:${v}%"></i></div><em>${v}%</em></div>`;
+$('#runEval').onclick=async()=>{
+  const b=$('#runEval'); b.disabled=true; b.textContent='Running…'; $('#evalOut').innerHTML='<div class="card typing"><i></i><i></i><i></i><span>&nbsp;Testing every strategy on every question…</span></div>';
+  try{
+    const r=await api('/api/evaluate',{method:'POST'}); if(r.error)throw new Error(r.error);
+    const base=r.configs[0], best=r.configs.reduce((a,c)=>c.hit1>a.hit1?c:a,r.configs[0]);
+    const short=n=>n.split(':')[0].replace(' (baseline)','');
+    $('#evalOut').innerHTML=`<div class="card"><div class="big">
+      <div class="kpi"><b>${r.questions}</b><span>test questions</span></div>
+      <div class="kpi"><b>${base.hit1}% → ${best.hit1}%</b><span>Hit@1: baseline → ${esc(short(best.name))}</span></div>
+      <div class="kpi"><b>${base.mrr} → ${best.mrr}</b><span>MRR (higher is better)</span></div></div></div>
+      <div class="card wrapx"><table><thead><tr><th>Strategy</th><th>Hit@1</th><th>Hit@3</th><th>Hit@5</th><th>MRR</th><th>Avg time</th></tr></thead><tbody>
+      ${r.configs.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${bar(c.hit1)}</td><td>${bar(c.hit3)}</td><td>${bar(c.hit5)}</td><td>${c.mrr}</td><td>${c.ms} ms</td></tr>`).join('')}</tbody></table>
+      <p class="hint">Hit@k = the correct passage is within the top k results. MRR = average of 1 / rank of the first correct passage.</p></div>
+      <div class="card wrapx"><table><thead><tr><th>Question</th>${r.config_names.map(n=>`<th>${esc(short(n))}</th>`).join('')}</tr></thead><tbody>
+      ${r.details.map(d=>`<tr><td>${esc(d.question)}<br><small style="color:var(--mute)">${esc(d.source||'')}</small></td>${d.ranks.map(x=>x?`<td class="ok-t">✓ #${x}</td>`:'<td class="no-t">✗</td>').join('')}</tr>`).join('')}</tbody></table></div>`;
+  }catch(e){$('#evalOut').innerHTML=`<div class="card errbox">⚠️ ${esc(e.message)}</div>`}
+  b.disabled=false; b.textContent='▶ Run benchmark again';
+};
+
+/* ---------- concept table ---------- */
+const C=[['Document loading (PDF, TXT)','rag/documents.py','b'],['Text splitting / chunking','rag/chunker.py','b'],['Embeddings (MiniLM)','rag/models.py','b'],
+['Vector database (FAISS)','rag/vector_store.py','b'],['Similarity search & Top-K','rag/vector_store.py','b'],['Prompt templates','rag/answer.py','b'],
+['LLM integration (Groq / OpenAI / Ollama)','rag/llm.py','k'],['Context-based generation','rag/answer.py','k'],['Query rewriting','rag/answer.py','k'],
+['Multi-query retrieval','rag/answer.py','k'],['Hybrid search (BM25 + vectors, RRF)','rag/retrieval.py, rag/bm25.py','b'],['Reranking (cross-encoder)','rag/retrieval.py','b'],
+['Metadata filtering (file + page range)','rag/vector_store.py','b'],['Multi-hop retrieval','rag/answer.py','k'],['Agentic RAG','—','n'],
+['Retrieval benchmark (Hit@k, MRR)','rag/evaluation.py','b'],['LLM answer judge (groundedness)','rag/evaluation.py','k'],
+['Source citations & “not found” fallback','rag/answer.py','b'],['Saved index (fast restart)','rag/vector_store.py','b']];
+$('#concepts').innerHTML=C.map(([a,b,s])=>`<tr><td>${a}</td><td><code>${b}</code></td><td><span class="st ${s}">${{b:'Built',k:'Needs LLM key',n:'Not built (future work)'}[s]}</span></td></tr>`).join('');
+
+poll();
+</script>
+</body>
+</html>

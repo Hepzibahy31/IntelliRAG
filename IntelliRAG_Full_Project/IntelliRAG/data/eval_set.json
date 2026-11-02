@@ -1,0 +1,128 @@
+[
+  {
+    "question": "How many days of maternity leave are given for pregnancy?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "180 days"
+    ]
+  },
+  {
+    "question": "How many days of leave for a miscarriage?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "total of 45 days"
+    ]
+  },
+  {
+    "question": "How many days of paternity leave can a male employee get?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "paternity leave for a period of 15 days"
+    ]
+  },
+  {
+    "question": "Can leave be claimed as a matter of right?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "cannot be claimed as a matter of right"
+    ]
+  },
+  {
+    "question": "Who has the authority to refuse or revoke leave?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "refuse or revoke"
+    ]
+  },
+  {
+    "question": "Is a medical certificate needed for miscarriage leave?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "certificate from a registered medical practitioner"
+    ]
+  },
+  {
+    "question": "What is the maximum duration of extraordinary leave without pay?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "maximum one year only"
+    ]
+  },
+  {
+    "question": "What is the policy on sexual harassment?",
+    "source": "HR_Policy.pdf",
+    "keywords": [
+      "sexual harassment"
+    ]
+  },
+  {
+    "question": "What is RAG?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "retrieval-augmented generation"
+    ]
+  },
+  {
+    "question": "What is chunking and why is it used?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "splitting large documents"
+    ]
+  },
+  {
+    "question": "What does cosine similarity measure?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "cosine of the angle"
+    ]
+  },
+  {
+    "question": "What is hybrid search?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "combines keyword-based retrieval"
+    ]
+  },
+  {
+    "question": "How is RAG different from fine-tuning?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "fine-tuning further trains"
+    ]
+  },
+  {
+    "question": "What is an API key?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "credential used to identify"
+    ]
+  },
+  {
+    "question": "What is a context window?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "context window is the amount"
+    ]
+  },
+  {
+    "question": "What is multi-query retrieval?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "multiple alternative versions"
+    ]
+  },
+  {
+    "question": "What is an LLM hallucination?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "false, unsupported"
+    ]
+  },
+  {
+    "question": "What does temperature do in an LLM?",
+    "source": "Python_Notes.txt",
+    "keywords": [
+      "lower values tend to produce more predictable output"
+    ]
+  }
+]
